@@ -1,0 +1,40 @@
+version: "3.8"  # Add version if it's missing
+
+services:
+  origin:
+    build:
+      context: .
+      dockerfile: origin/Dockerfile.origin  # Specify the Dockerfile for origin
+    container_name: origin
+    ports:
+      - "8080:80"
+    networks:
+      - cdnnet
+
+  edge1:
+    build:
+      context: .
+      dockerfile: edge/Dockerfile.edge  # Specify the Dockerfile for edge1
+    container_name: edge1
+    ports:
+      - "8082:80"
+    networks:
+      - cdnnet
+    depends_on:
+      - origin
+
+  cdn:
+    build:
+      context: .
+      dockerfile: edge/Dockerfile.edge  # Specify the Dockerfile for cdn (edge image)
+    container_name: edge
+    ports:
+      - "8081:80"
+    networks:
+      - cdnnet
+    depends_on:
+      - origin
+
+networks:
+  cdnnet:
+    driver: bridge
